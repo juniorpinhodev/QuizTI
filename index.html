@@ -1,0 +1,851 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Treinamento DATAPREV</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;800&display=swap');
+
+        /* Variáveis para os temas Claro e Escuro */
+        :root {
+            --bg-color: #ffffff;
+            --text-color: #4b4b4b;
+            --subtitle-color: #777777;
+            --border-color: #e5e5e5;
+            --opt-bg: #ffffff;
+            --opt-hover: #f7f7f7;
+            --theory-bg: #ddf4ff;
+            --theory-border: #84d8ff;
+            --theory-title: #1cb0f6;
+            --feedback-bg: rgba(255, 255, 255, 0.6);
+            --header-icon: #afafaf;
+            --selected-bg: #ddf4ff;
+        }
+
+        body.dark-mode {
+            --bg-color: #121212;
+            --text-color: #e0e0e0;
+            --subtitle-color: #a0a0a0;
+            --border-color: #333333;
+            --opt-bg: #1e1e1e;
+            --opt-hover: #2c2c2c;
+            --theory-bg: #1e293b;
+            --theory-border: #38bdf8;
+            --theory-title: #38bdf8;
+            --feedback-bg: rgba(0, 0, 0, 0.4);
+            --header-icon: #888888;
+            --selected-bg: #0c3149;
+        }
+
+        body {
+            font-family: 'Nunito', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            user-select: none;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        /* Controle de Tema */
+        .theme-toggle {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            font-size: 24px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: var(--header-icon);
+            padding: 5px;
+            z-index: 10;
+        }
+
+        /* Telas */
+        .screen {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+            height: 100%;
+            box-sizing: border-box;
+        }
+
+        .screen.active {
+            display: flex;
+        }
+
+        /* Tela Inicial e Assuntos */
+        .menu-container {
+            max-width: 400px;
+            width: 100%;
+            padding: 60px 20px 40px 20px;
+            text-align: center;
+            margin: auto;
+        }
+
+        .menu-title {
+            font-size: 28px;
+            font-weight: 800;
+            color: #58cc02;
+            margin-bottom: 10px;
+        }
+
+        .menu-subtitle {
+            font-size: 18px;
+            margin-bottom: 30px;
+            color: var(--subtitle-color);
+        }
+
+        .menu-btn {
+            padding: 15px;
+            font-size: 18px;
+            font-weight: 800;
+            border-radius: 15px;
+            border: 2px solid var(--border-color);
+            background-color: var(--opt-bg);
+            color: var(--text-color);
+            cursor: pointer;
+            width: 100%;
+            margin-bottom: 15px;
+            transition: all 0.2s;
+            box-shadow: 0 4px 0 var(--border-color);
+        }
+
+        .menu-btn:active {
+            transform: translateY(4px);
+            box-shadow: none;
+        }
+
+        .menu-btn.primary {
+            background-color: #58cc02;
+            color: #fff;
+            border-color: #58cc02;
+            box-shadow: 0 4px 0 #58a700;
+        }
+
+        .menu-btn.secondary {
+            background-color: #1cb0f6;
+            color: #fff;
+            border-color: #1cb0f6;
+            box-shadow: 0 4px 0 #1899d6;
+        }
+
+        /* Cabeçalho do Quiz */
+        .header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 15px 20px;
+            max-width: 800px;
+            margin: 0 auto;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        .nav-btn {
+            font-size: 24px;
+            color: var(--header-icon);
+            cursor: pointer;
+            font-weight: bold;
+            padding: 5px 10px;
+        }
+
+        .progress-bar {
+            flex-grow: 1;
+            height: 16px;
+            background-color: var(--border-color);
+            border-radius: 8px;
+            overflow: hidden;
+            margin: 0 15px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background-color: #58cc02;
+            width: 0%;
+            border-radius: 8px;
+            transition: width 0.4s ease;
+        }
+
+        /* Placar */
+        .score-board {
+            display: flex;
+            gap: 10px;
+            font-weight: 800;
+            font-size: 16px;
+        }
+        .score-correct { color: #58cc02; }
+        .score-wrong { color: #ea2b2b; }
+
+        /* Área da Pergunta */
+        .quiz-content {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 0 20px;
+            max-width: 600px;
+            margin: 0 auto;
+            width: 100%;
+            box-sizing: border-box;
+            overflow-y: auto;
+            padding-bottom: 20px;
+        }
+
+        /* Cartão de Teoria (Modo Aprender) */
+        .theory-card {
+            background-color: var(--theory-bg);
+            border: 2px solid var(--theory-border);
+            border-radius: 15px;
+            padding: 15px;
+            margin-bottom: 20px;
+            width: 100%;
+            box-sizing: border-box;
+            display: none;
+        }
+        
+        .theory-card h3 {
+            margin: 0 0 10px 0;
+            color: var(--theory-title);
+            font-size: 16px;
+            text-transform: uppercase;
+        }
+
+        .theory-card p {
+            margin: 0;
+            font-size: 15px;
+            font-weight: 700;
+            color: var(--text-color);
+            line-height: 1.4;
+        }
+
+        .question-title {
+            font-size: 19px;
+            font-weight: 800;
+            margin-bottom: 25px;
+            text-align: left;
+            width: 100%;
+            line-height: 1.4;
+        }
+
+        .options {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            width: 100%;
+        }
+
+        .option {
+            padding: 15px;
+            border: 2px solid var(--border-color);
+            background-color: var(--opt-bg);
+            border-radius: 15px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--text-color);
+            transition: all 0.2s ease;
+            line-height: 1.3;
+        }
+
+        .option:hover {
+            background-color: var(--opt-hover);
+        }
+
+        .option.selected {
+            border-color: #84d8ff;
+            background-color: var(--selected-bg);
+            color: #1cb0f6;
+        }
+
+        .option.correct {
+            border-color: #58cc02;
+            background-color: #d7ffb8;
+            color: #4b4b4b;
+            pointer-events: none;
+        }
+
+        .option.wrong {
+            border-color: #ea2b2b;
+            background-color: #ffdfe0;
+            color: #4b4b4b;
+            pointer-events: none;
+        }
+
+        body.dark-mode .option.correct { background-color: rgba(88, 204, 2, 0.2); color: #e0e0e0; }
+        body.dark-mode .option.wrong { background-color: rgba(234, 43, 43, 0.2); color: #e0e0e0; }
+
+        .option.disabled {
+            pointer-events: none;
+            opacity: 0.6;
+        }
+
+        /* Rodapé e Botões */
+        .footer {
+            border-top: 2px solid var(--border-color);
+            background-color: var(--bg-color);
+            padding: 15px 20px 20px 20px;
+            display: flex;
+            justify-content: center;
+            transition: background-color 0.3s;
+        }
+
+        .footer-content {
+            max-width: 600px;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .feedback-area {
+            display: none;
+            flex-direction: column;
+            margin-bottom: 15px;
+        }
+
+        .feedback-title {
+            font-size: 22px;
+            font-weight: 800;
+            margin-bottom: 8px;
+        }
+
+        .feedback-justification {
+            font-size: 15px;
+            font-weight: 700;
+            color: var(--text-color);
+            line-height: 1.4;
+            background-color: var(--feedback-bg);
+            padding: 10px;
+            border-radius: 10px;
+            margin: 0;
+        }
+
+        .feedback-correct { color: #58cc02; }
+        .feedback-wrong { color: #ea2b2b; }
+
+        .btn {
+            padding: 15px;
+            font-size: 17px;
+            font-weight: 800;
+            border-radius: 15px;
+            border: none;
+            cursor: pointer;
+            width: 100%;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: all 0.2s;
+        }
+
+        .btn-check { background-color: var(--border-color); color: var(--header-icon); pointer-events: none; }
+        .btn-check.active { background-color: #58cc02; color: #ffffff; box-shadow: 0 4px 0 #58a700; pointer-events: auto; }
+        .btn-check.active:active { transform: translateY(4px); box-shadow: none; }
+        
+        .footer.correct-bg { background-color: #d7ffb8; border-color: #d7ffb8; }
+        .footer.wrong-bg { background-color: #ffdfe0; border-color: #ffdfe0; }
+        
+        body.dark-mode .footer.correct-bg { background-color: rgba(88, 204, 2, 0.15); border-color: rgba(88, 204, 2, 0.3); }
+        body.dark-mode .footer.wrong-bg { background-color: rgba(234, 43, 43, 0.15); border-color: rgba(234, 43, 43, 0.3); }
+
+        .btn-continue-correct { background-color: #58cc02; color: #ffffff; box-shadow: 0 4px 0 #58a700; }
+        .btn-continue-wrong { background-color: #ea2b2b; color: #ffffff; box-shadow: 0 4px 0 #c72323; }
+        .btn-continue-correct:active, .btn-continue-wrong:active { transform: translateY(4px); box-shadow: none; }
+
+        /* Placar Final */
+        .final-score {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin: 20px 0;
+        }
+        .final-stat {
+            background-color: var(--opt-bg);
+            border: 2px solid var(--border-color);
+            padding: 15px 25px;
+            border-radius: 15px;
+            font-size: 20px;
+            font-weight: 800;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Botão de Tema Global -->
+    <button class="theme-toggle" onclick="toggleTheme()" title="Alternar Tema">🌓</button>
+
+    <!-- TELA INICIAL: Escolha do Modo -->
+    <div class="screen active" id="home-screen">
+        <div class="menu-container">
+            <div class="menu-title">Treinamento DATAPREV</div>
+            <div class="menu-subtitle">Como você quer estudar hoje?</div>
+            <button class="menu-btn primary" onclick="selectMode('aprender')">Modo Aprender (Teoria Antes)</button>
+            <button class="menu-btn secondary" onclick="selectMode('quiz')">Modo Quiz (Teoria Depois)</button>
+        </div>
+    </div>
+
+    <!-- TELA DE DISCIPLINAS: Escolha do Assunto -->
+    <div class="screen" id="subject-screen">
+        <div class="menu-container">
+            <div class="menu-title">Escolha o Assunto</div>
+            <div class="menu-subtitle">Filtre as questões por disciplina</div>
+            <button class="menu-btn" onclick="startQuiz('Língua Portuguesa')">Língua Portuguesa</button>
+            <button class="menu-btn" onclick="startQuiz('Raciocínio Lógico')">Raciocínio Lógico</button>
+            <button class="menu-btn" onclick="startQuiz('Segurança da Informação')">Segurança da Informação</button>
+            <button class="menu-btn" onclick="startQuiz('LGPD')">LGPD</button>
+            <button class="menu-btn primary" onclick="startQuiz('Todos')">Misturar Todos</button>
+            <br><br>
+            <div class="nav-btn" onclick="showScreen('home-screen')">← Voltar</div>
+        </div>
+    </div>
+
+    <!-- TELA DO QUIZ -->
+    <div class="screen" id="quiz-screen">
+        <div class="header">
+            <div class="nav-btn" id="btn-back" onclick="prevQuestion()" title="Questão Anterior">←</div>
+            <div class="progress-bar">
+                <div class="progress-fill" id="progress-fill"></div>
+            </div>
+            <div class="score-board">
+                <span class="score-correct" id="ui-score-correct">✅ 0</span>
+                <span class="score-wrong" id="ui-score-wrong">❌ 0</span>
+            </div>
+            <div class="nav-btn" onclick="showScreen('home-screen')" title="Sair do Quiz" style="margin-left: 15px;">×</div>
+        </div>
+
+        <div class="quiz-content" id="quiz-container">
+            <!-- Modo Aprender: Teoria em cima -->
+            <div class="theory-card" id="theory-card">
+                <h3>Teoria</h3>
+                <p id="theory-card-text"></p>
+            </div>
+
+            <div class="question-title" id="question-text">Carregando...</div>
+            <div class="options" id="options-container"></div>
+        </div>
+
+        <div class="footer" id="footer">
+            <div class="footer-content">
+                <!-- Modo Quiz: Teoria no rodapé -->
+                <div class="feedback-area" id="feedback-area">
+                    <div class="feedback-title" id="feedback-title"></div>
+                    <p class="feedback-justification" id="feedback-justification"></p>
+                </div>
+                <button class="btn btn-check" id="action-btn">Verificar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- TELA FINAL -->
+    <div class="screen" id="end-screen">
+        <div class="menu-container">
+            <div class="menu-title" style="font-size: 32px;">Lição Concluída!</div>
+            <div class="menu-subtitle">Veja o seu desempenho:</div>
+            
+            <div class="final-score">
+                <div class="final-stat" style="color: #58cc02;" id="final-correct">✅ 0</div>
+                <div class="final-stat" style="color: #ea2b2b;" id="final-wrong">❌ 0</div>
+            </div>
+
+            <button class="menu-btn primary" onclick="showScreen('home-screen')">Voltar ao Início</button>
+        </div>
+    </div>
+
+    <script>
+        // Toggle Dark Mode
+        function toggleTheme() {
+            document.body.classList.toggle('dark-mode');
+        }
+
+        // Banco de Questões Completíssimo
+        const allQuestions = [
+            // LÍNGUA PORTUGUESA
+            {
+                subject: 'Língua Portuguesa',
+                question: '"O atendimento remoto cresceu 40%. Apesar do avanço tecnológico, muitos preferem o presencial." A relação estabelecida pela palavra "apesar" indica:',
+                options: [
+                    "Adição de uma nova informação.",
+                    "Conclusão do raciocínio anterior.",
+                    "Contraste entre a informação anterior e a posterior.",
+                    "Explicação da causa do crescimento."
+                ],
+                answer: 2, 
+                justification: '"Apesar de" é locução concessiva que introduz contraste. O texto admite um fato (avanço) e em seguida apresenta algo que o contraria (preferir presencial).'
+            },
+            {
+                subject: 'Língua Portuguesa',
+                question: 'Em "Os servidores devem, sempre que possível, priorizar canais digitais...", a expressão destacada tem a função de:',
+                options: [
+                    "Tornar a orientação uma obrigação inegociável.",
+                    "Relativizar a orientação, admitindo exceções.",
+                    "Negar por completo a validade da orientação.",
+                    "Reforçar que o canal digital é o único permitido."
+                ],
+                answer: 1, 
+                justification: 'A expressão "sempre que possível" é um modalizador que suaviza a força da orientação, admitindo que em certas situações ela não se aplica.'
+            },
+
+            // RACIOCÍNIO LÓGICO
+            {
+                subject: 'Raciocínio Lógico',
+                question: 'Assinale a alternativa que apresenta uma proposição lógica (sentença declarativa que pode ser julgada verdadeira ou falsa):',
+                options: [
+                    "Que dia é hoje?",
+                    "Feche a porta, por favor.",
+                    "A DATAPREV foi fundada em 1974.",
+                    "Talvez chova amanhã."
+                ],
+                answer: 2, 
+                justification: 'Uma proposição lógica precisa ser uma sentença declarativa, afirmativa e que possa ser classificada objetivamente como verdadeira ou falsa. "A DATAPREV foi fundada em 1974" atende a esse critério. Perguntas, ordens e sentenças com incerteza subjetiva não são proposições lógicas.'
+            },
+            {
+                subject: 'Raciocínio Lógico',
+                question: 'Assinale a alternativa que apresenta corretamente o símbolo do conectivo "ou exclusivo" (disjunção exclusiva):',
+                options: [
+                    "Λ (E)",
+                    "v (Ou inclusivo)",
+                    "→ (Condicional)",
+                    "V (Ou exclusivo)"
+                ],
+                answer: 3, 
+                justification: 'O símbolo V (frequentemente sublinhado, ⊻) representa o "ou exclusivo", que é verdadeiro quando exatamente uma das proposições é verdadeira (não ambas). Os demais representam conjunção, disjunção inclusiva e condicional.'
+            },
+
+            // SEGURANÇA DA INFORMAÇÃO
+            {
+                subject: 'Segurança da Informação',
+                question: 'O princípio da segurança da informação que garante que uma informação só seja acessada por pessoas autorizadas é conhecido como:',
+                options: [
+                    "Integridade.",
+                    "Disponibilidade.",
+                    "Confidencialidade.",
+                    "Autenticidade."
+                ],
+                answer: 2, 
+                justification: 'A confidencialidade garante que a informação seja acessível apenas a quem tem autorização para tal, protegendo-a contra acesso, divulgação ou exposição não autorizada. Dica de Prova: Confidencialidade = sigilo/restrição de acesso.'
+            },
+            {
+                subject: 'Segurança da Informação',
+                question: 'Um ataque de negação de serviço (DoS/DDoS) tem como objetivo principal comprometer qual princípio da segurança da informação?',
+                options: [
+                    "Confidencialidade, pois expõe dados sigilosos.",
+                    "Integridade, pois altera o conteúdo dos dados.",
+                    "Disponibilidade, pois torna o sistema inacessível.",
+                    "Não repúdio, pois impede a identificação do atacante."
+                ],
+                answer: 2, 
+                justification: 'Ataques DoS/DDoS sobrecarregam um sistema com tráfego excessivo, tornando-o incapaz de responder a requisições legítimas – o objetivo central é comprometer a DISPONIBILIDADE do serviço.'
+            },
+            {
+                subject: 'Segurança da Informação',
+                question: 'Na criptografia assimétrica, para enviar uma mensagem confidencial a um destinatário, o remetente deve criptografar a mensagem utilizando:',
+                options: [
+                    "A chave privada do próprio remetente.",
+                    "A chave pública do próprio remetente.",
+                    "A chave pública do destinatário.",
+                    "A chave privada do destinatário."
+                ],
+                answer: 2, 
+                justification: 'Na criptografia assimétrica, para garantir CONFIDENCIALIDADE, o remetente criptografa a mensagem com a CHAVE PÚBLICA do destinatário; apenas a CHAVE PRIVADA correspondente pode decifrar a mensagem.'
+            },
+            {
+                subject: 'Segurança da Informação',
+                question: 'Um firewall tem como principal função:',
+                options: [
+                    "Fazer backup automático de arquivos.",
+                    "Criptografar dados armazenados em disco.",
+                    "Controlar e filtrar o tráfego de rede com base em regras de segurança.",
+                    "Detectar e remover vírus de arquivos infectados."
+                ],
+                answer: 2, 
+                justification: 'O firewall é um dispositivo que monitora e controla o tráfego de rede, permitindo ou bloqueando pacotes de dados com base em um conjunto de regras de segurança predefinidas.'
+            },
+
+            // LGPD
+            {
+                subject: 'LGPD',
+                question: 'Assinale a alternativa que apresenta corretamente o conceito de "tratamento de dados", conforme a LGPD:',
+                options: [
+                    "Apenas a coleta inicial dos dados pessoais.",
+                    "Apenas o armazenamento de dados em bancos de dados digitais.",
+                    "Toda operação realizada com dados pessoais, como coleta, recepção, acesso, transmissão, armazenamento e eliminação.",
+                    "Exclusivamente operações realizadas por órgãos públicos."
+                ],
+                answer: 2, 
+                justification: 'A LGPD define "tratamento" de forma ampla, abrangendo TODA operação realizada com dados pessoais, incluindo coleta, produção, recepção, eliminação, etc.'
+            },
+            {
+                subject: 'LGPD',
+                question: 'Segundo a LGPD, o "controlador" é definido como a pessoa natural ou jurídica que:',
+                options: [
+                    "Apenas executa o tratamento de dados por instrução de terceiros.",
+                    "Compete as decisões referentes ao tratamento de dados pessoais.",
+                    "Representa exclusivamente o titular dos dados.",
+                    "Armazena fisicamente os servidores de dados."
+                ],
+                answer: 1, 
+                justification: 'O controlador é a pessoa natural ou jurídica, de direito público ou privado, a quem competem as decisões referentes ao tratamento de dados pessoais – ou seja, é quem determina as finalidades e os meios.'
+            },
+            {
+                subject: 'LGPD',
+                question: 'O princípio da "necessidade", previsto na LGPD, determina que o tratamento de dados deve se limitar:',
+                options: [
+                    "Ao máximo de dados possível, para eventual uso futuro da empresa.",
+                    "Ao mínimo necessário para a realização de suas finalidades, com abrangência dos dados pertinentes.",
+                    "A um prazo indeterminado de armazenamento.",
+                    "Apenas a dados sensíveis, sendo irrelevante para dados comuns."
+                ],
+                answer: 1, 
+                justification: 'O princípio da necessidade exige que o tratamento se limite ao MÍNIMO necessário para a realização de suas finalidades, abrangendo dados pertinentes, proporcionais e não excessivos (minimização de dados).'
+            },
+            {
+                subject: 'LGPD',
+                question: 'Diante de um vazamento de dados pessoais que possa acarretar risco relevante aos titulares, o controlador deve, segundo a LGPD:',
+                options: [
+                    "Aguardar até 1 ano para comunicar o incidente, sem urgência.",
+                    "Comunicar à ANPD e aos titulares afetados em prazo razoável, informando a natureza dos dados e riscos envolvidos.",
+                    "Comunicar apenas à imprensa, dispensando a ANPD.",
+                    "Comunicar apenas aos concorrentes do setor, como boa prática de mercado."
+                ],
+                answer: 1, 
+                justification: 'A LGPD exige que o controlador comunique à ANPD e ao titular a ocorrência de incidente de segurança que possa acarretar risco ou dano relevante aos titulares, em prazo razoável.'
+            }
+        ];
+
+        // Estado do App
+        let currentMode = 'quiz';
+        let currentSubject = 'Todos';
+        let filteredQuestions = [];
+        let currentQuestionIndex = 0;
+        let selectedOptionIndex = null;
+        let isChecking = true;
+        let userAnswers = [];
+        
+        // Contadores de Placar
+        let score = { correct: 0, wrong: 0 };
+
+        // Navegação de Telas
+        function showScreen(screenId) {
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            document.getElementById(screenId).classList.add('active');
+        }
+
+        function selectMode(mode) {
+            currentMode = mode;
+            showScreen('subject-screen');
+        }
+
+        function startQuiz(subject) {
+            currentSubject = subject;
+            if (subject === 'Todos') {
+                filteredQuestions = [...allQuestions];
+            } else {
+                filteredQuestions = allQuestions.filter(q => q.subject === subject);
+            }
+            
+            currentQuestionIndex = 0;
+            score = { correct: 0, wrong: 0 };
+            userAnswers = new Array(filteredQuestions.length).fill(null);
+            
+            updateScoreUI();
+            showScreen('quiz-screen');
+            loadQuestion();
+        }
+
+        // Lógica do Quiz
+        const questionText = document.getElementById('question-text');
+        const optionsContainer = document.getElementById('options-container');
+        const actionBtn = document.getElementById('action-btn');
+        const progressFill = document.getElementById('progress-fill');
+        const footer = document.getElementById('footer');
+        const feedbackArea = document.getElementById('feedback-area');
+        const feedbackTitle = document.getElementById('feedback-title');
+        const feedbackJustification = document.getElementById('feedback-justification');
+        const theoryCard = document.getElementById('theory-card');
+        const theoryCardText = document.getElementById('theory-card-text');
+        const btnBack = document.getElementById('btn-back');
+
+        function loadQuestion() {
+            const currentQ = filteredQuestions[currentQuestionIndex];
+            
+            questionText.innerText = `(${currentQ.subject}) ${currentQ.question}`;
+            
+            if (currentMode === 'aprender') {
+                theoryCard.style.display = 'block';
+                theoryCardText.innerText = currentQ.justification;
+                feedbackJustification.style.display = 'none'; 
+            } else {
+                theoryCard.style.display = 'none';
+                feedbackJustification.style.display = 'block'; 
+            }
+
+            btnBack.style.visibility = currentQuestionIndex > 0 ? 'visible' : 'hidden';
+
+            optionsContainer.innerHTML = '';
+            selectedOptionIndex = null;
+            footer.className = "footer";
+            feedbackArea.style.display = "none";
+            
+            const previousAnswer = userAnswers[currentQuestionIndex];
+            if (previousAnswer !== null) {
+                isChecking = false;
+                renderOptionsAlreadyAnswered(currentQ, previousAnswer);
+            } else {
+                isChecking = true;
+                actionBtn.innerText = "Verificar";
+                actionBtn.className = "btn btn-check";
+                renderOptionsToAnswer(currentQ);
+            }
+
+            updateProgress();
+        }
+
+        function renderOptionsToAnswer(currentQ) {
+            currentQ.options.forEach((opt, index) => {
+                const div = document.createElement('div');
+                div.className = 'option';
+                div.innerText = opt;
+                div.onclick = () => selectOption(index, div);
+                optionsContainer.appendChild(div);
+            });
+        }
+
+        function renderOptionsAlreadyAnswered(currentQ, answeredIndex) {
+            currentQ.options.forEach((opt, index) => {
+                const div = document.createElement('div');
+                div.className = 'option disabled';
+                div.innerText = opt;
+                
+                if (index === currentQ.answer) {
+                    div.classList.add('correct');
+                } else if (index === answeredIndex) {
+                    div.classList.add('wrong');
+                }
+                optionsContainer.appendChild(div);
+            });
+
+            if (answeredIndex === currentQ.answer) {
+                footer.classList.add('correct-bg');
+                actionBtn.className = "btn btn-continue-correct";
+                feedbackTitle.innerText = "Excelente!";
+                feedbackTitle.className = "feedback-title feedback-correct";
+            } else {
+                footer.classList.add('wrong-bg');
+                actionBtn.className = "btn btn-continue-wrong";
+                feedbackTitle.innerText = "A resposta correta era:";
+                feedbackTitle.className = "feedback-title feedback-wrong";
+            }
+            
+            actionBtn.innerText = "Avançar";
+            feedbackJustification.innerText = "Teoria: " + currentQ.justification;
+            feedbackArea.style.display = "flex";
+        }
+
+        function selectOption(index, element) {
+            if (!isChecking) return; 
+
+            selectedOptionIndex = index;
+            const allOptions = document.querySelectorAll('.option');
+            allOptions.forEach(opt => opt.classList.remove('selected'));
+            element.classList.add('selected');
+
+            actionBtn.classList.add('active');
+        }
+
+        function handleAction() {
+            if (isChecking) {
+                checkAnswer();
+            } else {
+                nextQuestion();
+            }
+        }
+
+        function checkAnswer() {
+            isChecking = false;
+            const currentQ = filteredQuestions[currentQuestionIndex];
+            userAnswers[currentQuestionIndex] = selectedOptionIndex; 
+            
+            const allOptions = document.querySelectorAll('.option');
+            allOptions.forEach(opt => opt.classList.add('disabled'));
+            
+            feedbackJustification.innerText = "Teoria: " + currentQ.justification;
+
+            if (selectedOptionIndex === currentQ.answer) {
+                allOptions[selectedOptionIndex].classList.add('correct');
+                allOptions[selectedOptionIndex].classList.remove('selected');
+                footer.classList.add('correct-bg');
+                actionBtn.className = "btn btn-continue-correct";
+                feedbackTitle.innerText = "Excelente!";
+                feedbackTitle.className = "feedback-title feedback-correct";
+                score.correct++;
+            } else {
+                allOptions[selectedOptionIndex].classList.add('wrong');
+                allOptions[selectedOptionIndex].classList.remove('selected');
+                allOptions[currentQ.answer].classList.add('correct');
+                footer.classList.add('wrong-bg');
+                actionBtn.className = "btn btn-continue-wrong";
+                feedbackTitle.innerText = "A resposta correta era:";
+                feedbackTitle.className = "feedback-title feedback-wrong";
+                score.wrong++;
+            }
+            
+            updateScoreUI();
+            actionBtn.innerText = "Avançar";
+            feedbackArea.style.display = "flex";
+        }
+
+        function nextQuestion() {
+            currentQuestionIndex++;
+            if (currentQuestionIndex < filteredQuestions.length) {
+                loadQuestion();
+            } else {
+                showEndScreen();
+            }
+        }
+
+        function prevQuestion() {
+            if (currentQuestionIndex > 0) {
+                const prevAnswer = userAnswers[currentQuestionIndex - 1];
+                if (prevAnswer !== null) {
+                    const prevQ = filteredQuestions[currentQuestionIndex - 1];
+                    if (prevAnswer === prevQ.answer) {
+                        score.correct--;
+                    } else {
+                        score.wrong--;
+                    }
+                    userAnswers[currentQuestionIndex - 1] = null; 
+                    updateScoreUI();
+                }
+                
+                currentQuestionIndex--;
+                loadQuestion();
+            }
+        }
+
+        function updateProgress() {
+            const percent = (currentQuestionIndex / filteredQuestions.length) * 100;
+            progressFill.style.width = `${percent}%`;
+        }
+
+        function updateScoreUI() {
+            document.getElementById('ui-score-correct').innerText = `✅ ${score.correct}`;
+            document.getElementById('ui-score-wrong').innerText = `❌ ${score.wrong}`;
+        }
+
+        function showEndScreen() {
+            progressFill.style.width = `100%`;
+            document.getElementById('final-correct').innerText = `✅ ${score.correct}`;
+            document.getElementById('final-wrong').innerText = `❌ ${score.wrong}`;
+            showScreen('end-screen');
+        }
+
+        actionBtn.addEventListener('click', () => {
+            if (selectedOptionIndex !== null || !isChecking) {
+                handleAction();
+            }
+        });
+    </script>
+</body>
+</html>
