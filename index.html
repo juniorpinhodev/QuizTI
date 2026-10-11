@@ -151,7 +151,7 @@
         <div class="menu-container" style="padding-top: 10px;">
             <div class="menu-title">Escolha o Assunto</div>
             <div class="menu-subtitle">Filtre as questões por disciplina</div>
-            <button class="menu-btn" onclick="startQuiz('Língua Portuguesa')">Língua Portuguesa</button>
+            <div id="subject-buttons"></div>
             <button class="menu-btn primary" onclick="startQuiz('Todos')">Misturar Todos</button>
         </div>
     </div>
@@ -2344,6 +2344,7 @@
             loadQuestion();
         }
 
+        const subjectButtonsContainer = document.getElementById('subject-buttons');
         const questionText = document.getElementById('question-text');
         const optionsContainer = document.getElementById('options-container');
         const actionBtn = document.getElementById('action-btn');
@@ -2356,6 +2357,24 @@
         const theoryCard = document.getElementById('theory-card');
         const theoryCardText = document.getElementById('theory-card-text');
         const btnBack = document.getElementById('btn-back');
+
+        function getAvailableSubjects() {
+            return [...new Set(allQuestions.map(question => question.subject))];
+        }
+
+        function renderSubjectButtons() {
+            subjectButtonsContainer.innerHTML = '';
+
+            getAvailableSubjects().forEach(subject => {
+                const subjectButton = document.createElement('button');
+                subjectButton.className = 'menu-btn';
+                subjectButton.innerText = subject;
+                subjectButton.onclick = () => startQuiz(subject);
+                subjectButtonsContainer.appendChild(subjectButton);
+            });
+        }
+
+        renderSubjectButtons();
 
         function loadQuestion() {
             if(filteredQuestions.length === 0) {
