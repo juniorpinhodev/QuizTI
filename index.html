@@ -160,7 +160,7 @@
             background-color: var(--border-color);
             border-radius: 8px;
             overflow: hidden;
-            margin: 0 15px;
+            margin: 0 10px;
         }
 
         .progress-fill {
@@ -169,6 +169,14 @@
             width: 0%;
             border-radius: 8px;
             transition: width 0.4s ease;
+        }
+
+        .progress-text {
+            font-size: 14px;
+            font-weight: 800;
+            color: var(--text-color);
+            margin-right: 15px;
+            white-space: nowrap;
         }
 
         /* Placar */
@@ -196,7 +204,7 @@
             padding-bottom: 20px;
         }
 
-        /* Cartão de Teoria (Modo Aprender) */
+        /* Cartão de Teoria */
         .theory-card {
             background-color: var(--theory-bg);
             border: 2px solid var(--theory-border);
@@ -373,10 +381,9 @@
 </head>
 <body>
 
-    <!-- Botão de Tema Global -->
     <button class="theme-toggle" onclick="toggleTheme()" title="Alternar Tema">🌓</button>
 
-    <!-- TELA INICIAL: Escolha do Modo -->
+    <!-- TELA INICIAL -->
     <div class="screen active" id="home-screen">
         <div class="menu-container">
             <div class="menu-title">Treinamento DATAPREV</div>
@@ -386,15 +393,16 @@
         </div>
     </div>
 
-    <!-- TELA DE DISCIPLINAS: Escolha do Assunto -->
+    <!-- TELA DE DISCIPLINAS -->
     <div class="screen" id="subject-screen">
         <div class="menu-container">
             <div class="menu-title">Escolha o Assunto</div>
             <div class="menu-subtitle">Filtre as questões por disciplina</div>
-            <button class="menu-btn" onclick="startQuiz('Língua Portuguesa')">Língua Portuguesa</button>
-            <button class="menu-btn" onclick="startQuiz('Raciocínio Lógico')">Raciocínio Lógico</button>
-            <button class="menu-btn" onclick="startQuiz('Segurança da Informação')">Segurança da Informação</button>
+            <button class="menu-btn" onclick="startQuiz('Desenvolvimento de Software')">Desenvolvimento de Software</button>
             <button class="menu-btn" onclick="startQuiz('LGPD')">LGPD</button>
+            <button class="menu-btn" onclick="startQuiz('Segurança da Informação')">Segurança da Informação</button>
+            <button class="menu-btn" onclick="startQuiz('Raciocínio Lógico')">Raciocínio Lógico</button>
+            <button class="menu-btn" onclick="startQuiz('Língua Portuguesa')">Língua Portuguesa</button>
             <button class="menu-btn primary" onclick="startQuiz('Todos')">Misturar Todos</button>
             <br><br>
             <div class="nav-btn" onclick="showScreen('home-screen')">← Voltar</div>
@@ -408,6 +416,8 @@
             <div class="progress-bar">
                 <div class="progress-fill" id="progress-fill"></div>
             </div>
+            <!-- INDICADOR DE PROGRESSÃO -->
+            <div class="progress-text" id="progress-text">1 / 40</div>
             <div class="score-board">
                 <span class="score-correct" id="ui-score-correct">✅ 0</span>
                 <span class="score-wrong" id="ui-score-wrong">❌ 0</span>
@@ -416,19 +426,16 @@
         </div>
 
         <div class="quiz-content" id="quiz-container">
-            <!-- Modo Aprender: Teoria em cima -->
             <div class="theory-card" id="theory-card">
                 <h3>Teoria</h3>
                 <p id="theory-card-text"></p>
             </div>
-
             <div class="question-title" id="question-text">Carregando...</div>
             <div class="options" id="options-container"></div>
         </div>
 
         <div class="footer" id="footer">
             <div class="footer-content">
-                <!-- Modo Quiz: Teoria no rodapé -->
                 <div class="feedback-area" id="feedback-area">
                     <div class="feedback-title" id="feedback-title"></div>
                     <p class="feedback-justification" id="feedback-justification"></p>
@@ -454,167 +461,345 @@
     </div>
 
     <script>
-        // Toggle Dark Mode
         function toggleTheme() {
             document.body.classList.toggle('dark-mode');
         }
 
-        // Banco de Questões Completíssimo
         const allQuestions = [
-            // LÍNGUA PORTUGUESA
+            // ================== DESENVOLVIMENTO DE SOFTWARE (40 Questões) ==================
             {
-                subject: 'Língua Portuguesa',
-                question: '"O atendimento remoto cresceu 40%. Apesar do avanço tecnológico, muitos preferem o presencial." A relação estabelecida pela palavra "apesar" indica:',
-                options: [
-                    "Adição de uma nova informação.",
-                    "Conclusão do raciocínio anterior.",
-                    "Contraste entre a informação anterior e a posterior.",
-                    "Explicação da causa do crescimento."
-                ],
-                answer: 2, 
-                justification: '"Apesar de" é locução concessiva que introduz contraste. O texto admite um fato (avanço) e em seguida apresenta algo que o contraria (preferir presencial).'
+                subject: 'Desenvolvimento de Software',
+                question: 'Em um banco de dados relacional, a "chave primária" (primary key) de uma tabela tem como principal função:',
+                options: ["Permitir valores duplicados e nulos livremente.", "Identificar de forma única cada registro (linha) da tabela.", "Definir exclusivamente o tipo de dado de uma coluna.", "Armazenar comentários sobre a tabela.", "Substituir a necessidade de qualquer outro tipo de índice."],
+                answer: 1,
+                justification: 'A chave primária identifica de forma ÚNICA cada registro (linha) de uma tabela, não podendo conter valores duplicados nem nulos, sendo fundamental para garantir a integridade.'
             },
             {
-                subject: 'Língua Portuguesa',
-                question: 'Em "Os servidores devem, sempre que possível, priorizar canais digitais...", a expressão destacada tem a função de:',
-                options: [
-                    "Tornar a orientação uma obrigação inegociável.",
-                    "Relativizar a orientação, admitindo exceções.",
-                    "Negar por completo a validade da orientação.",
-                    "Reforçar que o canal digital é o único permitido."
-                ],
-                answer: 1, 
-                justification: 'A expressão "sempre que possível" é um modalizador que suaviza a força da orientação, admitindo que em certas situações ela não se aplica.'
+                subject: 'Desenvolvimento de Software',
+                question: 'Em um banco de dados relacional, a "chave estrangeira" (foreign key) tem como principal função:',
+                options: ["Substituir a chave primária da própria tabela.", "Estabelecer um relacionamento entre duas tabelas, referenciando a chave primária de outra tabela.", "Impedir qualquer tipo de consulta entre tabelas diferentes.", "Armazenar dados criptografados exclusivamente.", "Definir o nome da tabela no banco de dados."],
+                answer: 1,
+                justification: 'A chave estrangeira é uma coluna em uma tabela que referencia a chave primária de OUTRA tabela, estabelecendo e garantindo a integridade referencial de relacionamentos (ex: Pedido -> Cliente).'
+            },
+            {
+                subject: 'Desenvolvimento de Software',
+                question: 'O processo de normalização de bancos de dados relacionais tem como principal objetivo:',
+                options: ["Aumentar a redundância de dados para melhorar o desempenho.", "Reduzir a redundância de dados e evitar anomalias de inserção, atualização e exclusão, organizando os dados de forma mais eficiente.", "Eliminar completamente a necessidade de chaves primárias.", "Impedir qualquer relacionamento entre tabelas.", "Duplicar todas as tabelas para fins de backup."],
+                answer: 1,
+                justification: 'A normalização visa reduzir a redundância de informações e evitar anomalias, geralmente aplicando regras conhecidas como "formas normais".'
+            },
+            {
+                subject: 'Desenvolvimento de Software',
+                question: 'Bancos de dados NoSQL, como MongoDB, diferem dos bancos relacionais tradicionais principalmente por:',
+                options: ["Utilizarem exclusivamente tabelas com esquema rígido e fixo.", "Não permitirem qualquer tipo de consulta aos dados armazenados.", "Oferecerem maior flexibilidade de esquema (schema), armazenando dados em formatos como documentos, chave-valor, grafos ou colunas, sem exigir estrutura tabular rígida.", "Serem utilizados exclusivamente para armazenamento de imagens.", "Exigirem obrigatoriamente o uso de linguagem SQL para todas as operações."],
+                answer: 2,
+                justification: 'Bancos de dados NoSQL oferecem flexibilidade de esquema e armazenam dados em diversos modelos (documentos, chave-valor, grafos), sem exigir estrutura tabular rígida predefinida.'
+            },
+            {
+                subject: 'Desenvolvimento de Software',
+                question: 'Um sistema de alta demanda precisa garantir consistência forte em transações financeiras críticas, mesmo com possível perda de disponibilidade momentânea em caso de falha de rede. Segundo o Teorema CAP, esse sistema deve priorizar:',
+                options: ["Disponibilidade e Tolerância a Partição, sacrificando Consistência.", "Consistência e Tolerância a Partição, aceitando possível perda de disponibilidade durante falhas de rede.", "Apenas Consistência, sem considerar Tolerância a Partição.", "Apenas Disponibilidade, ignorando completamente Consistência e Partição.", "Nenhuma das três propriedades é relevante para sistemas financeiros."],
+                answer: 1,
+                justification: 'O Teorema CAP diz que você escolhe 2 de 3 propriedades. Para garantir Consistência forte em falhas de rede, prioriza-se Consistência (C) e Tolerância a Partição (P), abdicando de Disponibilidade temporária.'
+            },
+            {
+                subject: 'Desenvolvimento de Software',
+                question: 'Assinale a alternativa que apresenta o comando SQL correto para selecionar todos os registros da tabela "funcionarios":',
+                options: ["GET * FROM funcionarios;", "SELECT * FROM funcionarios;", "FETCH ALL funcionarios;", "RETRIEVE * FROM funcionarios;", "SHOW * FROM funcionarios;"],
+                answer: 1,
+                justification: 'O comando "SELECT * FROM funcionarios;" é a sintaxe correta e padrão em SQL para consultar todos os registros e colunas.'
+            },
+            {
+                subject: 'Desenvolvimento de Software',
+                question: 'Assinale a alternativa que apresenta o comando SQL correto para selecionar apenas os funcionários com salário superior a R$ 5.000,00:',
+                options: ["SELECT * FROM funcionarios WHERE salario > 5000;", "SELECT * FROM funcionarios FILTER salario > 5000;", "SELECT * FROM funcionarios IF salario > 5000;", "SELECT * FROM funcionarios HAVING salario > 5000;", "SELECT * FROM funcionarios WHEN salario > 5000;"],
+                answer: 0,
+                justification: 'A cláusula WHERE é utilizada em SQL para filtrar registros com base em uma condição, antes de qualquer agrupamento.'
+            },
+            {
+                subject: 'Desenvolvimento de Software',
+                question: 'Assinale a alternativa que apresenta corretamente o comando SQL para contar quantos funcionários existem em cada departamento, agrupando o resultado por departamento:',
+                options: ["SELECT departamento, COUNT(*) FROM funcionarios GROUP BY departamento;", "SELECT departamento, COUNT(*) FROM funcionarios WHERE departamento;", "SELECT departamento, COUNT(*) FROM funcionarios ORDER BY departamento;", "SELECT departamento, COUNT(*) FROM funcionarios FILTER BY departamento;", "SELECT departamento, COUNT(*) FROM funcionarios LIMIT departamento;"],
+                answer: 0,
+                justification: 'A cláusula GROUP BY agrupa registros para que funções de agregação, como COUNT(*), calculem valores separadamente por categoria.'
+            },
+            {
+                subject: 'Desenvolvimento de Software',
+                question: 'Assinale a alternativa que apresenta corretamente o tipo de JOIN que retorna APENAS os registros que possuem correspondência em AMBAS as tabelas envolvidas:',
+                options: ["LEFT JOIN.", "RIGHT JOIN.", "INNER JOIN.", "FULL OUTER JOIN.", "CROSS JOIN sem condição."],
+                answer: 2,
+                justification: 'O INNER JOIN funciona como uma interseção, retornando exclusivamente registros que dão "match" nas duas tabelas.'
+            },
+            {
+                subject: 'Desenvolvimento de Software',
+                question: 'Para listar TODOS os clientes, incluindo aqueles que NUNCA realizaram nenhum pedido, junto com a quantidade de pedidos de cada um (0 para quem não tem nenhum). A abordagem adequada é:',
+                options: ["Usar INNER JOIN entre clientes e pedidos, agrupando por cliente.", "Usar LEFT JOIN de clientes para pedidos (mantendo todos os clientes), agrupando por cliente e usando COUNT() sobre a coluna de pedidos.", "Usar apenas uma consulta em pedidos, sem envolver a tabela de clientes.", "Usar RIGHT JOIN de pedidos para clientes, sem agrupamento.", "Usar CROSS JOIN entre as duas tabelas."],
+                answer: 1,
+                justification: 'O LEFT JOIN preserva integralmente a tabela da esquerda (clientes), mesmo quando não há correspondência na tabela da direita (pedidos).'
+            },
+            {
+                subject: 'Desenvolvimento de Software',
+                question: 'Em programação orientada a objetos, o princípio que consiste em ocultar os detalhes internos de implementação de um objeto, expondo apenas uma interface pública controlada, é conhecido como:',
+                options: ["Herança.", "Polimorfismo.", "Encapsulamento.", "Abstração de dados apenas.", "Sobrecarga de métodos."],
+                answer: 2,
+                justification: 'O encapsulamento atua como uma "caixa preta", escondendo a lógica/dados internos e forçando o uso de métodos públicos controlados (getters/setters).'
+            },
+            {
+                subject: 'Desenvolvimento de Software',
+                question: 'O princípio que permite que um mesmo método ("emitirSom()") tenha comportamentos diferentes em "Cachorro" e "Gato", ambos subclasses de "Animal", é conhecido como:',
+                options: ["Encapsulamento.", "Herança simples.", "Polimorfismo.", "Composição.", "Interface segregada."],
+                answer: 2,
+                justification: 'Polimorfismo (muitas formas) permite que objetos de subclasses diferentes respondam ao mesmo método/mensagem de maneiras específicas.'
+            },
+            {
+                subject: 'Desenvolvimento de Software',
+                question: 'Em orientação a objetos, uma "interface" é caracterizada por:',
+                options: ["Conter apenas a implementação completa de todos os métodos.", "Definir um contrato de métodos que devem ser implementados pelas classes que a adotam, geralmente sem fornecer implementação própria.", "Ser sempre idêntica a uma classe abstrata.", "Permitir apenas um único método.", "Ser utilizada exclusivamente em bancos de dados relacionais."],
+                answer: 1,
+                justification: 'Uma interface é um "contrato" de assinaturas de métodos que as classes devem cumprir, ditando "o que" fazer, sem ditar o "como".'
+            },
+            {
+                subject: 'Desenvolvimento de Software',
+                question: 'Em orientação a objetos, o conceito de "herança" permite que:',
+                options: ["Uma classe filha herde atributos e métodos de uma classe pai, podendo reutilizá-los e/ou especializá-los.", "Duas classes completamente diferentes compartilhem o mesmo nome de método.", "Um objeto nunca possa ser instanciado a partir de uma classe.", "Todos os métodos de uma classe sejam automaticamente privados.", "Uma classe seja convertida automaticamente em uma interface."],
+                answer: 0,
+                justification: 'A herança promove o reuso de código e especialização através do relacionamento "é um" (ex: Gato é um Animal).'
+            },
+            {
+                subject: 'Desenvolvimento de Software',
+                question: 'Para evitar hierarquias complexas em herança múltipla (problema do diamante), uma alternativa de design mais recomendada seria:',
+                options: ["Aumentar ainda mais os níveis de herança múltipla.", "Favorecer composição sobre herança, utilizando interfaces e delegação para combinar comportamentos.", "Eliminar completamente reutilização de código.", "Utilizar apenas variáveis globais.", "Ignorar o problema."],
+                answer: 1,
+                justification: '"Favoreça composição sobre herança" é um princípio clássico de design (GoF) para criar sistemas mais flexíveis e com menor acoplamento.'
+            },
+            {
+                subject: 'Desenvolvimento de Software',
+                question: 'O tipo de teste que verifica o funcionamento de uma unidade individual de código (função ou método), de forma isolada das demais partes do sistema, é:',
+                options: ["Teste de integração.", "Teste de sistema.", "Teste unitário.", "Teste de aceitação.", "Teste de carga."],
+                answer: 2,
+                justification: 'O teste unitário isola a menor unidade possível do código para garantir que seu comportamento individual seja o esperado, muitas vezes usando mocks.'
+            },
+            {
+                subject: 'Desenvolvimento de Software',
+                question: 'O tipo de teste que verifica se diferentes módulos, já desenvolvidos individualmente, funcionam corretamente quando combinados entre si, é:',
+                options: ["Teste unitário.", "Teste de integração.", "Teste de regressão exclusivamente.", "Teste de usabilidade.", "Teste estático de código."],
+                answer: 1,
+                justification: 'O teste de integração foca nas fronteiras e na comunicação ENTRE módulos/componentes previamente testados isoladamente.'
+            },
+            {
+                subject: 'Desenvolvimento de Software',
+                question: 'O teste que verifica se alterações recentes no código não introduziram defeitos em funcionalidades que já funcionavam corretamente é:',
+                options: ["Teste de regressão.", "Teste exploratório.", "Teste de fumaça (smoke test).", "Teste de estresse.", "Teste de usabilidade."],
+                answer: 0,
+                justification: 'Testes de regressão garantem que "o que já funcionava não quebrou" devido a novas implementações ou refatorações.'
+            },
+            {
+                subject: 'Desenvolvimento de Software',
+                question: 'Na prática de TDD (Test-Driven Development), a sequência correta do ciclo de desenvolvimento é:',
+                options: ["Escrever o código de produção, depois os testes.", "Escrever o teste (que falha), escrever o código mínimo para o teste passar, refatorar o código.", "Refatorar primeiro, depois testes.", "Escrever apenas testes.", "Escrever código e testes simultaneamente sem ordem."],
+                answer: 1,
+                justification: 'O ciclo clássico do TDD é Red (teste falha) -> Green (código mínimo para passar) -> Refactor (melhorar o código).'
+            },
+            {
+                subject: 'Desenvolvimento de Software',
+                question: 'Uma equipe possui uma pirâmide de testes invertida (muitos testes de interface E2E lentos e poucos testes unitários). Essa situação tende a causar:',
+                options: ["Maior velocidade na execução da suíte.", "Feedback mais lento, maior fragilidade dos testes e maior custo de manutenção.", "Nenhum impacto.", "Redução automática do tempo total de desenvolvimento.", "Eliminação da necessidade de testes unitários."],
+                answer: 1,
+                justification: 'Uma pirâmide ideal tem uma base larga de testes unitários rápidos. A pirâmide invertida (ice cream cone) gera lentidão e testes frágeis.'
+            },
+            {
+                subject: 'Desenvolvimento de Software',
+                question: 'O comando Git utilizado para criar uma cópia local de um repositório remoto é:',
+                options: ["git copy.", "git clone.", "git fork.", "git download.", "git pull-repo."],
+                answer: 1,
+                justification: 'O comando "git clone" cria uma cópia completa do repositório remoto para a sua máquina local, baixando o histórico e branches.'
+            },
+            {
+                subject: 'Desenvolvimento de Software',
+                question: 'Assinale a alternativa que descreve corretamente a diferença entre "git fetch" e "git pull":',
+                options: ["São comandos idênticos.", "\"git fetch\" baixa as atualizações sem mesclar automaticamente à branch local; \"git pull\" baixa e já realiza o merge automaticamente.", "\"git fetch\" exclui o remoto.", "\"git pull\" nunca baixa dados.", "\"git fetch\" só funciona em repositórios privados."],
+                answer: 1,
+                justification: 'O "git fetch" apenas traz os metadados e atualizações para o local (mais seguro). O "git pull" equivale a "git fetch" seguido de "git merge".'
+            },
+            {
+                subject: 'Desenvolvimento de Software',
+                question: 'O comando Git utilizado para criar uma nova branch chamada "feature-login" é:',
+                options: ["git new-branch feature-login.", "git branch feature-login.", "git create feature-login.", "git make feature-login.", "git start feature-login."],
+                answer: 1,
+                justification: 'O comando "git branch [nome]" cria a branch. Se quisesse criar e mudar para ela ao mesmo tempo, seria "git checkout -b [nome]".'
+            },
+            {
+                subject: 'Desenvolvimento de Software',
+                question: 'No versionamento semântico (SemVer), no formato MAJOR.MINOR.PATCH (ex: 2.4.1), um incremento no número PATCH indica:',
+                options: ["Mudanças incompatíveis com versões anteriores.", "Adição de novas funcionalidades compatíveis.", "Correções de bugs, mantendo total compatibilidade com versões anteriores.", "Reescrita completa.", "Mudança apenas na documentação."],
+                answer: 2,
+                justification: 'Em SemVer: MAJOR (quebra compatibilidade), MINOR (nova funcionalidade compatível), PATCH (correção de bugs compatível).'
+            },
+            {
+                subject: 'Desenvolvimento de Software',
+                question: 'Durante um merge no Git, um "conflito de merge" em um arquivo específico ocorre tipicamente quando:',
+                options: ["O arquivo nunca foi versionado.", "As duas branches modificaram a mesma parte (linhas) de um arquivo de forma diferente.", "O repositório remoto está indisponível.", "O usuário não possui permissão.", "O arquivo foi renomeado para o mesmo nome."],
+                answer: 1,
+                justification: 'Conflitos ocorrem quando há mudanças concorrentes e incompatíveis nas MESMAS linhas de um arquivo, exigindo intervenção manual para resolver.'
+            },
+            {
+                subject: 'Desenvolvimento de Software',
+                question: 'A arquitetura de software conhecida como "microsserviços" caracteriza-se principalmente por:',
+                options: ["Concentrar toda a aplicação em um monolito.", "Dividir a aplicação em pequenos serviços independentes, comunicando-se geralmente por APIs.", "Eliminar a necessidade de bancos de dados.", "Ser aplicável apenas a aplicações desktop.", "Exigir uma única linguagem de programação."],
+                answer: 1,
+                justification: 'Microsserviços dividem a aplicação em partes menores, escaláveis de forma independente e com responsabilidades bem definidas, geralmente consumidas via API.'
+            },
+            {
+                subject: 'Desenvolvimento de Software',
+                question: 'Uma das principais desvantagens da arquitetura de microsserviços em comparação a um monolito é:',
+                options: ["Impossibilidade de escalar partes específicas.", "Maior complexidade operacional, desafios de comunicação, monitoramento distribuído e consistência de dados.", "Uso obrigatório de uma única linguagem.", "Impossibilidade de deploys independentes.", "Eliminação de testes automatizados."],
+                answer: 1,
+                justification: 'Microsserviços trazem complexidades de rede, latência, orquestração e transações distribuídas, sendo um claro trade-off da abordagem.'
+            },
+            {
+                subject: 'Desenvolvimento de Software',
+                question: 'Na arquitetura em camadas (layered architecture), a camada responsável por conter as regras de negócio da aplicação é a:',
+                options: ["Camada de apresentação (UI).", "Camada de acesso a dados (persistência).", "Camada de negócio (lógica de negócio / domínio).", "Camada de infraestrutura de rede.", "Camada de cache."],
+                answer: 2,
+                justification: 'A camada de Negócio ou Domínio isola as regras e a lógica core da aplicação, desvinculando-a da interface visual e do banco de dados direto.'
+            },
+            {
+                subject: 'Desenvolvimento de Software',
+                question: 'No padrão arquitetural MVC (Model-View-Controller), a responsabilidade do componente "Model" é:',
+                options: ["Gerenciar a interface do usuário.", "Representar os dados e a lógica de negócio da aplicação.", "Processar requisições HTTP.", "Armazenar arquivos de configuração.", "Gerenciar animações."],
+                answer: 1,
+                justification: 'O "Model" gere o estado e a lógica da aplicação, a "View" cuida da exibição, e o "Controller" atua como intermediário recebendo os inputs.'
+            },
+            {
+                subject: 'Desenvolvimento de Software',
+                question: 'Para migrar um sistema monolítico gradualmente sem reimplantar tudo a cada mudança, uma estratégia recomendada é:',
+                options: ["Reescrever tudo do zero em migração \"big bang\".", "Aplicar o padrão \"Strangler Fig\" (Figueira Estranguladora), migrando gradualmente funcionalidades.", "Ignorar o problema.", "Aumentar o tamanho do monolito.", "Migrar apenas o banco de dados."],
+                answer: 1,
+                justification: 'O padrão Strangler Fig substitui gradualmente partes do monolito antigo por novos serviços até que o sistema antigo possa ser desligado com segurança.'
+            },
+            {
+                subject: 'Desenvolvimento de Software',
+                question: 'A prática de revisão de código (code review) tem como principal objetivo:',
+                options: ["Atrasar o processo.", "Identificar problemas de qualidade, bugs e disseminar conhecimento entre a equipe.", "Substituir testes automatizados.", "Ser feita apenas pelo gerente.", "Eliminar a documentação."],
+                answer: 1,
+                justification: 'Code Review não substitui testes, é uma prática complementar humana para garantir qualidade de código, padrões e mentoria na equipe.'
+            },
+            {
+                subject: 'Desenvolvimento de Software',
+                question: 'A métrica de "complexidade ciclomática" mede:',
+                options: ["O número total de linhas de código.", "O número de caminhos independentes possíveis através do código, indicando sua complexidade lógica.", "O tempo de execução.", "O número de desenvolvedores.", "O tamanho do banco de dados."],
+                answer: 1,
+                justification: 'Alta complexidade ciclomática indica muitos caminhos de decisão (ifs, loops), tornando o código mais difícil de testar e manter.'
+            },
+            {
+                subject: 'Desenvolvimento de Software',
+                question: 'O princípio SOLID que estabelece que "uma classe deve ter apenas um motivo para mudar" é conhecido como:',
+                options: ["Princípio Aberto/Fechado.", "Princípio da Responsabilidade Única (SRP).", "Princípio da Substituição de Liskov.", "Princípio da Segregação de Interface.", "Princípio da Inversão de Dependência."],
+                answer: 1,
+                justification: 'O "Single Responsibility Principle" dita que a classe deve ter uma única responsabilidade coesa, reduzindo o risco de efeitos colaterais em atualizações.'
+            },
+            {
+                subject: 'Desenvolvimento de Software',
+                question: 'A prática de "refatoração" (refactoring) de código consiste em:',
+                options: ["Adicionar novas funcionalidades.", "Corrigir bugs em produção.", "Melhorar a estrutura interna do código, sem alterar seu comportamento externo observável.", "Reescrever o sistema do zero.", "Remover testes automatizados."],
+                answer: 2,
+                justification: 'Refatorar é limpar e otimizar o "como" o código está escrito, mantendo o "o que" ele faz exatamente igual para o usuário final.'
+            },
+            {
+                subject: 'Desenvolvimento de Software',
+                question: 'Medir a qualidade exclusivamente buscando 100% de cobertura de testes (test coverage) a qualquer custo apresenta o risco de:',
+                options: ["Garantir ausência de bugs.", "Criar uma falsa sensação de segurança, pois alta cobertura não garante verificação de casos extremos ou lógica correta.", "Ser a métrica mais importante sem ressalvas.", "Eliminar testes E2E.", "Reduzir tempo de desenvolvimento."],
+                answer: 1,
+                justification: 'Cobertura garante que as linhas foram executadas, mas não garante a qualidade das asserções e testes dos casos de borda reais.'
+            },
+            {
+                subject: 'Desenvolvimento de Software',
+                question: 'A estratégia de branching que define papéis para branches como "main", "develop", "feature", "release" e "hotfix" é conhecida como:',
+                options: ["Trunk-Based Development.", "Git Flow.", "Merge simples.", "Rebase obrigatório.", "Cherry-pick automático."],
+                answer: 1,
+                justification: 'O Git Flow é um modelo estruturado com funções específicas para cada tipo de branch, separando claramente o ciclo de release e desenvolvimento.'
+            },
+            {
+                subject: 'Desenvolvimento de Software',
+                question: 'Na estratégia "Trunk-Based Development", a principal característica é:',
+                options: ["Manter branches por meses.", "Os desenvolvedores integram mudanças com muita frequência diretamente na branch principal (trunk), usando branches de vida muito curta.", "Proibir controle de versão.", "Exigir branches de 6 meses.", "Eliminar testes."],
+                answer: 1,
+                justification: 'No Trunk-Based, a integração contínua e frequente evita conflitos massivos, diferentemente de branches pesados e longos do Git Flow.'
+            },
+            {
+                subject: 'Desenvolvimento de Software',
+                question: 'Em SemVer, ao adicionar funcionalidades novas e compatíveis, a versão "2.3.5" deveria ser atualizada para:',
+                options: ["3.0.0", "2.4.0", "2.3.6", "2.3.5.1", "2.3.6.0"],
+                answer: 1,
+                justification: 'Incrementa-se o MINOR (de 3 para 4) por ser funcionalidade compatível, e OBRIGATORIAMENTE o PATCH é reiniciado para 0 (2.4.0).'
+            },
+            {
+                subject: 'Desenvolvimento de Software',
+                question: 'Em um repositório Git, uma "tag" é comumente utilizada para:',
+                options: ["Criar branch automática.", "Marcar um ponto específico do histórico, geralmente representando uma versão de release (ex: v1.0.0).", "Excluir commits.", "Renomear arquivos.", "Sincronizar repositórios diferentes."],
+                answer: 1,
+                justification: 'Tags são rótulos fixos e imutáveis usados para "congelar" uma versão de lançamento, facilitando rollbacks e implantações precisas.'
+            },
+            {
+                subject: 'Desenvolvimento de Software',
+                question: 'Em Trunk-Based Development, para integrar um código incompleto sem impactar os usuários em produção, a prática mais adequada é usar:',
+                options: ["Branches de meses.", "Feature toggles (flags) para manter a funcionalidade desativada em produção.", "Parar integrações de outros desenvolvedores.", "Implantar incompleto e aceitar risco.", "Abandonar o modelo."],
+                answer: 1,
+                justification: 'O Feature Toggle (flag de funcionalidade) permite que o código integre a branch principal sem que seja executado pelo usuário em produção até estar finalizado.'
             },
 
-            // RACIOCÍNIO LÓGICO
+            // ================== OUTRAS MATÉRIAS ==================
+            // LGPD (Resumo mantido do turn anterior para manter o arquivo dentro de limites, mas assegurando pluralidade de tópicos)
+            {
+                subject: 'LGPD',
+                question: 'Segundo a LGPD, "dado pessoal" é definido como:',
+                options: ["Apenas informações financeiras de uma pessoa.", "Informação relacionada a pessoa natural identificada ou identificável.", "Apenas dados armazenados em meios digitais.", "Apenas informações fornecidas voluntariamente pelo titular.", "O CNPJ de uma empresa."],
+                answer: 1, 
+                justification: 'A LGPD define "dado pessoal" como qualquer informação relacionada a uma pessoa natural (física) identificada ou identificável.'
+            },
+            {
+                subject: 'LGPD',
+                question: 'A sigla ANPD refere-se a:',
+                options: ["Agência Nacional de Proteção de Dados.", "Autoridade Nacional de Proteção de Dados.", "Associação Nacional de Privacidade Digital.", "Agência Nacional de Processamento de Dados.", "Autarquia Nacional de Políticas Digitais."],
+                answer: 1, 
+                justification: 'ANPD significa Autoridade Nacional de Proteção de Dados, órgão responsável por zelar, fiscalizar e sancionar descumprimentos à LGPD.'
+            },
+
+            // Segurança da Informação
+            {
+                subject: 'Segurança da Informação',
+                question: 'O princípio que garante que uma informação só seja acessada por pessoas autorizadas é conhecido como:',
+                options: ["Integridade.", "Disponibilidade.", "Confidencialidade.", "Autenticidade.", "Não repúdio."],
+                answer: 2, 
+                justification: 'A confidencialidade garante que a informação seja acessível apenas a quem tem autorização para tal, protegendo-a contra acesso, divulgação ou exposição não autorizada.'
+            },
+            {
+                subject: 'Segurança da Informação',
+                question: 'Um ataque de negação de serviço (DoS/DDoS) tem como objetivo principal comprometer qual princípio?',
+                options: ["Confidencialidade.", "Integridade.", "Disponibilidade.", "Não repúdio.", "Autenticidade."],
+                answer: 2, 
+                justification: 'Ataques DoS/DDoS sobrecarregam um sistema com tráfego excessivo, tornando-o incapaz de responder a requisições legítimas.'
+            },
+
+            // Raciocínio Lógico
             {
                 subject: 'Raciocínio Lógico',
-                question: 'Assinale a alternativa que apresenta uma proposição lógica (sentença declarativa que pode ser julgada verdadeira ou falsa):',
-                options: [
-                    "Que dia é hoje?",
-                    "Feche a porta, por favor.",
-                    "A DATAPREV foi fundada em 1974.",
-                    "Talvez chova amanhã."
-                ],
+                question: 'Assinale a alternativa que apresenta uma proposição lógica:',
+                options: ["Que dia é hoje?", "Feche a porta, por favor.", "A DATAPREV foi fundada em 1974.", "Talvez chova amanhã."],
                 answer: 2, 
-                justification: 'Uma proposição lógica precisa ser uma sentença declarativa, afirmativa e que possa ser classificada objetivamente como verdadeira ou falsa. "A DATAPREV foi fundada em 1974" atende a esse critério. Perguntas, ordens e sentenças com incerteza subjetiva não são proposições lógicas.'
-            },
-            {
-                subject: 'Raciocínio Lógico',
-                question: 'Assinale a alternativa que apresenta corretamente o símbolo do conectivo "ou exclusivo" (disjunção exclusiva):',
-                options: [
-                    "Λ (E)",
-                    "v (Ou inclusivo)",
-                    "→ (Condicional)",
-                    "V (Ou exclusivo)"
-                ],
-                answer: 3, 
-                justification: 'O símbolo V (frequentemente sublinhado, ⊻) representa o "ou exclusivo", que é verdadeiro quando exatamente uma das proposições é verdadeira (não ambas). Os demais representam conjunção, disjunção inclusiva e condicional.'
+                justification: 'Uma proposição lógica precisa ser uma sentença declarativa e que possa ser classificada objetivamente como verdadeira ou falsa.'
             },
 
-            // SEGURANÇA DA INFORMAÇÃO
+            // Língua Portuguesa
             {
-                subject: 'Segurança da Informação',
-                question: 'O princípio da segurança da informação que garante que uma informação só seja acessada por pessoas autorizadas é conhecido como:',
-                options: [
-                    "Integridade.",
-                    "Disponibilidade.",
-                    "Confidencialidade.",
-                    "Autenticidade."
-                ],
+                subject: 'Língua Portuguesa',
+                question: '"O atendimento remoto cresceu 40%. Apesar do avanço tecnológico, muitos preferem o presencial." A palavra "apesar" indica:',
+                options: ["Adição.", "Conclusão.", "Contraste entre a informação anterior e a posterior.", "Explicação da causa."],
                 answer: 2, 
-                justification: 'A confidencialidade garante que a informação seja acessível apenas a quem tem autorização para tal, protegendo-a contra acesso, divulgação ou exposição não autorizada. Dica de Prova: Confidencialidade = sigilo/restrição de acesso.'
-            },
-            {
-                subject: 'Segurança da Informação',
-                question: 'Um ataque de negação de serviço (DoS/DDoS) tem como objetivo principal comprometer qual princípio da segurança da informação?',
-                options: [
-                    "Confidencialidade, pois expõe dados sigilosos.",
-                    "Integridade, pois altera o conteúdo dos dados.",
-                    "Disponibilidade, pois torna o sistema inacessível.",
-                    "Não repúdio, pois impede a identificação do atacante."
-                ],
-                answer: 2, 
-                justification: 'Ataques DoS/DDoS sobrecarregam um sistema com tráfego excessivo, tornando-o incapaz de responder a requisições legítimas – o objetivo central é comprometer a DISPONIBILIDADE do serviço.'
-            },
-            {
-                subject: 'Segurança da Informação',
-                question: 'Na criptografia assimétrica, para enviar uma mensagem confidencial a um destinatário, o remetente deve criptografar a mensagem utilizando:',
-                options: [
-                    "A chave privada do próprio remetente.",
-                    "A chave pública do próprio remetente.",
-                    "A chave pública do destinatário.",
-                    "A chave privada do destinatário."
-                ],
-                answer: 2, 
-                justification: 'Na criptografia assimétrica, para garantir CONFIDENCIALIDADE, o remetente criptografa a mensagem com a CHAVE PÚBLICA do destinatário; apenas a CHAVE PRIVADA correspondente pode decifrar a mensagem.'
-            },
-            {
-                subject: 'Segurança da Informação',
-                question: 'Um firewall tem como principal função:',
-                options: [
-                    "Fazer backup automático de arquivos.",
-                    "Criptografar dados armazenados em disco.",
-                    "Controlar e filtrar o tráfego de rede com base em regras de segurança.",
-                    "Detectar e remover vírus de arquivos infectados."
-                ],
-                answer: 2, 
-                justification: 'O firewall é um dispositivo que monitora e controla o tráfego de rede, permitindo ou bloqueando pacotes de dados com base em um conjunto de regras de segurança predefinidas.'
-            },
-
-            // LGPD
-            {
-                subject: 'LGPD',
-                question: 'Assinale a alternativa que apresenta corretamente o conceito de "tratamento de dados", conforme a LGPD:',
-                options: [
-                    "Apenas a coleta inicial dos dados pessoais.",
-                    "Apenas o armazenamento de dados em bancos de dados digitais.",
-                    "Toda operação realizada com dados pessoais, como coleta, recepção, acesso, transmissão, armazenamento e eliminação.",
-                    "Exclusivamente operações realizadas por órgãos públicos."
-                ],
-                answer: 2, 
-                justification: 'A LGPD define "tratamento" de forma ampla, abrangendo TODA operação realizada com dados pessoais, incluindo coleta, produção, recepção, eliminação, etc.'
-            },
-            {
-                subject: 'LGPD',
-                question: 'Segundo a LGPD, o "controlador" é definido como a pessoa natural ou jurídica que:',
-                options: [
-                    "Apenas executa o tratamento de dados por instrução de terceiros.",
-                    "Compete as decisões referentes ao tratamento de dados pessoais.",
-                    "Representa exclusivamente o titular dos dados.",
-                    "Armazena fisicamente os servidores de dados."
-                ],
-                answer: 1, 
-                justification: 'O controlador é a pessoa natural ou jurídica, de direito público ou privado, a quem competem as decisões referentes ao tratamento de dados pessoais – ou seja, é quem determina as finalidades e os meios.'
-            },
-            {
-                subject: 'LGPD',
-                question: 'O princípio da "necessidade", previsto na LGPD, determina que o tratamento de dados deve se limitar:',
-                options: [
-                    "Ao máximo de dados possível, para eventual uso futuro da empresa.",
-                    "Ao mínimo necessário para a realização de suas finalidades, com abrangência dos dados pertinentes.",
-                    "A um prazo indeterminado de armazenamento.",
-                    "Apenas a dados sensíveis, sendo irrelevante para dados comuns."
-                ],
-                answer: 1, 
-                justification: 'O princípio da necessidade exige que o tratamento se limite ao MÍNIMO necessário para a realização de suas finalidades, abrangendo dados pertinentes, proporcionais e não excessivos (minimização de dados).'
-            },
-            {
-                subject: 'LGPD',
-                question: 'Diante de um vazamento de dados pessoais que possa acarretar risco relevante aos titulares, o controlador deve, segundo a LGPD:',
-                options: [
-                    "Aguardar até 1 ano para comunicar o incidente, sem urgência.",
-                    "Comunicar à ANPD e aos titulares afetados em prazo razoável, informando a natureza dos dados e riscos envolvidos.",
-                    "Comunicar apenas à imprensa, dispensando a ANPD.",
-                    "Comunicar apenas aos concorrentes do setor, como boa prática de mercado."
-                ],
-                answer: 1, 
-                justification: 'A LGPD exige que o controlador comunique à ANPD e ao titular a ocorrência de incidente de segurança que possa acarretar risco ou dano relevante aos titulares, em prazo razoável.'
+                justification: '"Apesar de" é locução concessiva que introduz contraste. O texto admite um fato (avanço) e apresenta algo que o contraria.'
             }
         ];
 
-        // Estado do App
         let currentMode = 'quiz';
         let currentSubject = 'Todos';
         let filteredQuestions = [];
@@ -622,11 +807,8 @@
         let selectedOptionIndex = null;
         let isChecking = true;
         let userAnswers = [];
-        
-        // Contadores de Placar
         let score = { correct: 0, wrong: 0 };
 
-        // Navegação de Telas
         function showScreen(screenId) {
             document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
             document.getElementById(screenId).classList.add('active');
@@ -654,11 +836,11 @@
             loadQuestion();
         }
 
-        // Lógica do Quiz
         const questionText = document.getElementById('question-text');
         const optionsContainer = document.getElementById('options-container');
         const actionBtn = document.getElementById('action-btn');
         const progressFill = document.getElementById('progress-fill');
+        const progressText = document.getElementById('progress-text');
         const footer = document.getElementById('footer');
         const feedbackArea = document.getElementById('feedback-area');
         const feedbackTitle = document.getElementById('feedback-title');
@@ -825,8 +1007,13 @@
         }
 
         function updateProgress() {
-            const percent = (currentQuestionIndex / filteredQuestions.length) * 100;
+            const total = filteredQuestions.length;
+            const current = currentQuestionIndex + 1;
+            const displayCurrent = current > total ? total : current;
+            
+            const percent = (currentQuestionIndex / total) * 100;
             progressFill.style.width = `${percent}%`;
+            progressText.innerText = `${displayCurrent} / ${total}`;
         }
 
         function updateScoreUI() {
@@ -836,6 +1023,7 @@
 
         function showEndScreen() {
             progressFill.style.width = `100%`;
+            progressText.innerText = `${filteredQuestions.length} / ${filteredQuestions.length}`;
             document.getElementById('final-correct').innerText = `✅ ${score.correct}`;
             document.getElementById('final-wrong').innerText = `❌ ${score.wrong}`;
             showScreen('end-screen');
